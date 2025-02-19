@@ -7,3 +7,5 @@ How to use it:
 4. Press the button 'Load Session'
 
 Closing the first plot, the second will appear and so on.
+
+NOTE: This Tool works effectively with recent years, going way back in the years could bring out problems in the API
