@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import gui
 import seaborn as sns
-from datetime import timedelta
 
 # Define team colors
 TEAM_COLORS = {
@@ -60,9 +59,7 @@ def load_session(mode, year, grand_prix, session_type):
 
 # Plot 1: Stint comparison between drivers
 def plot_stint_comparison(session, drivers, team_colors):
-    if len(drivers) != 2:
-        raise ValueError("Please provide exactly two drivers for comparison.")
-    
+
     plt.style.use("dark_background")
     plt.figure(figsize=(12, 6), dpi=100)
     
@@ -70,12 +67,11 @@ def plot_stint_comparison(session, drivers, team_colors):
     
     for driver in drivers:
         laps = session.laps.pick_drivers(driver)
-        if laps.empty:
-            continue  # Skip if no laps recorded for the driver
 
-        team = laps.iloc[0]["Team"]  # Get team name
+        team = laps.iloc[0]["Team"]  
         color = team_colors.get(team, "white")  
-        final_position = laps.iloc[-1]["Position"]  # Get final position
+        final_position = laps.iloc[-1]["Position"]  
+        pit_stops = laps["PitInTime"].count()
         driver_positions[driver] = final_position
 
         # Get lap numbers and valid lap times
@@ -97,7 +93,7 @@ def plot_stint_comparison(session, drivers, team_colors):
             pit_exit_laps = pit_exit_laps[1:]           
         
         # Plot stint comparison
-        plt.plot(lap_numbers, lap_times, color=color, linewidth=2, label=f"{driver} (P{int(final_position)})")
+        plt.plot(lap_numbers, lap_times, color=color, linewidth=2, label=f"{driver} P{int(final_position)}, {pit_stops} stop")
 
         # Mark pit exit laps with vertical dashed lines
         for pit_exit in pit_exit_laps:
@@ -108,14 +104,13 @@ def plot_stint_comparison(session, drivers, team_colors):
     plt.xlabel("Lap Number")
     plt.ylabel("Lap Time (s)")
     plt.title(f"{session.event['EventName']} {session.event.year} {session.name} - Stint Comparison \n"
-              f"{driver_info}"
-              )
+              f"{driver_info}")
     plt.legend()
     plt.grid(True, linestyle="--", alpha=0.5)
     plt.show()
 
 # Plot 2: Lap time distribution
-def plot_lap_time_distribution(session, team_colors):
+def plot_lap_time_distribution(session):
     plt.style.use("dark_background")
     
     laps = session.laps.pick_quicklaps()
@@ -130,7 +125,6 @@ def plot_lap_time_distribution(session, team_colors):
     )
     print(team_order)
 
-    # make a color palette associating team names to hex codes
     team_palette = {team: fastf1.plotting.get_team_color(team, session)
                     for team in team_order}
 
@@ -153,7 +147,6 @@ def plot_lap_time_distribution(session, team_colors):
               f"Lap Time Distribution")
     plt.grid(True, linestyle="--", alpha=0.5)
 
-    # x-label is redundant
     ax.set(xlabel=None)
     plt.tight_layout()
     plt.show()
@@ -178,7 +171,7 @@ def plot_best_laps(session):
 
     # Format time to m:ss.sss
     total_seconds = best_lap_time.total_seconds()
-    formatted_time = f"{int(total_seconds // 60)}:{total_seconds % 60:06.3f}"  # MM:SS.sss
+    formatted_time = f"{int(total_seconds // 60)}:{total_seconds % 60:06.3f}"  
 
     plt.figure(figsize=(10, 6), dpi=100) 
 
@@ -227,7 +220,7 @@ def plot_lap_comparison(session, driver1, driver2):
 
     # Format time to m:ss.sss
     total_seconds = best_lap_time.total_seconds()
-    formatted_time = f"{int(total_seconds // 60)}:{total_seconds % 60:06.3f}"  # MM:SS.sss
+    formatted_time = f"{int(total_seconds // 60)}:{total_seconds % 60:06.3f}"  
 
     fig, axs = plt.subplots(3, 1, figsize=(12, 10), dpi=100)
 
@@ -269,7 +262,7 @@ def plot_lap_comparison(session, driver1, driver2):
     plt.show()
 
 
-# Plot Maximum Speeds Compared to Best Lap Times
+# Plot 3: Maximum Speeds Compared to Best Lap Times
 def plot_max_speeds(session):
     drivers = session.laps["Driver"].unique()
     max_speeds = {}
@@ -287,10 +280,10 @@ def plot_max_speeds(session):
 
     delta_times = [(best_laps[drv] - min(best_laps.values())).total_seconds() for drv in drivers]
     speeds = [max_speeds[drv].max() for drv in drivers]
-    colors = [team_colors[drv] for drv in drivers]  # Assign colors per driver
+    colors = [team_colors[drv] for drv in drivers] 
 
     plt.figure(figsize=(10, 6), dpi=100)
-    plt.scatter(delta_times, speeds, color=colors, edgecolors="white", s=100)  # Use team colors
+    plt.scatter(delta_times, speeds, color=colors, edgecolors="white", s=100) 
 
     for drv, x, y, color in zip(drivers, delta_times, speeds, colors):
         plt.text(x, y, drv, fontsize=9, color=color, ha="left", va="bottom")
@@ -302,6 +295,6 @@ def plot_max_speeds(session):
     plt.style.use("dark_background")
     plt.show()
 
-# Run the GUI and pass user selections to load session
+
 if __name__ == "__main__":
     gui.run_gui()

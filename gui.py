@@ -28,7 +28,7 @@ def on_load_session():
                 f1_analysis.plot_max_speeds(session)
             elif session_type == "Race":
                 f1_analysis.plot_stint_comparison(session, [driver1, driver2], TEAM_COLORS)
-                f1_analysis.plot_lap_time_distribution(session, TEAM_COLORS)
+                f1_analysis.plot_lap_time_distribution(session)
             elif session_type in ["FP1", "FP2", "FP3"]:
                 f1_analysis.plot_lap_time_distribution(session, TEAM_COLORS)
                 f1_analysis.plot_max_speeds(session)
@@ -74,16 +74,16 @@ def run_gui():
     mode_menu.grid(row=1, column=1, columnspan=2, padx=10, pady=10)
 
     # Year, Grand Prix, Session (Centered)
-    year_var = ctk.StringVar(value="Year")
-    year_entry = ctk.CTkEntry(frame, textvariable=year_var, width=100, font=("Segoe UI", 16,"bold"), justify="center")
-    year_entry.grid(row=2, column=0, padx=10, pady=10)
+    year_var = ctk.StringVar(value="Select Year")
+    year_menu = ctk.CTkComboBox(frame, variable=year_var, values=["2024", "2023","2022","2021","2020","2019","2018"], font=("Segoe UI", 16,"bold"), width=130, justify="center")
+    year_menu.grid(row=2, column=0, padx=10, pady=10)
 
-    gp_var = ctk.StringVar(value="Monaco")
-    gp_menu = ctk.CTkComboBox(frame, variable=gp_var, values=["Bahrain", "Saudi Arabia", "Australia", "Japan", "China", "Miami", "Emilia Romagna", "Monaco", "Canada", "Spain", "Austria", "Silverstone", "Hungary", "Belgium", "Netherlands", "Italy", "Azerbaijan", "Singapore", "Austin", "Mexico", "Brazil", "Las Vegas", "Qatar", "Abu Dhabi"], font=("Segoe UI", 16,"bold"), width=130, justify="center")
+    gp_var = ctk.StringVar(value="Select GP")
+    gp_menu = ctk.CTkComboBox(frame, variable=gp_var, values=["Bahrain", "Saudi Arabia", "Australia", "Japan", "China", "Miami", "Emilia Romagna", "Monaco", "Canada", "Spain", "Austria", "Silverstone", "Hungary", "Belgium", "Netherlands", "Italy", "Azerbaijan", "Singapore", "Austin", "Mexico", "Brazil", "Las Vegas", "Qatar", "Abu Dhabi"], font=("Segoe UI", 16,"bold"), width=120, justify="center")
     gp_menu.grid(row=2, column=1, padx=10, pady=10)
 
-    session_var = ctk.StringVar(value="Qualifying")
-    session_menu = ctk.CTkComboBox(frame, variable=session_var, values=["FP1", "FP2", "FP3", "Qualifying", "Race"], font=("Segoe UI", 16,"bold"), width=130, justify="center")
+    session_var = ctk.StringVar(value="Select Session")
+    session_menu = ctk.CTkComboBox(frame, variable=session_var, values=["FP1", "FP2", "FP3", "Qualifying", "Race"], font=("Segoe UI", 16,"bold"), width=142, justify="center")
     session_menu.grid(row=2, column=2, padx=10, pady=10)
 
     # Image in the middle
@@ -91,12 +91,12 @@ def run_gui():
     bg_label.grid(row=3, column=0, columnspan=3)
 
     # Driver 1
-    driver1_var = ctk.StringVar(value='Driver 1')
+    driver1_var = ctk.StringVar(value='Insert Driver 1')
     driver1_entry = ctk.CTkEntry(frame, textvariable=driver1_var, placeholder_text="Driver 1", width=120, font=("Segoe UI", 16,"bold"), justify="center")
     driver1_entry.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
 
     # Driver 2
-    driver2_var = ctk.StringVar(value='Driver 2')
+    driver2_var = ctk.StringVar(value='Insert Driver 2')
     driver2_entry = ctk.CTkEntry(frame, textvariable=driver2_var, placeholder_text="Driver 2", width=120, font=("Segoe UI", 16,"bold"), justify="center")
     driver2_entry.grid(row=4, column=1, columnspan=2, pady=20)
 
