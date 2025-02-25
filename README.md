@@ -2,7 +2,7 @@ F1 Analysis is a tool for analyzing F1 Telemetry Data from all the sessions usin
 
 How to access it:
 1. Download the folder from GitHub
-2. Open it on your IDE
+2. Open it on your IDE (python 3.10 or higher required)
 3. Install dependencies needed from terminal writing  >> pip install -r requirements.txt
 
 How to use it:
