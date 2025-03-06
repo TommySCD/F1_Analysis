@@ -4,12 +4,12 @@ import f1_analysis
 from PIL import Image
 from f1_analysis import TEAM_COLORS
 
+# Load session from inputs
 def on_load_session():
-    """Handles button click to load session data without blocking GUI."""
     
     def load_and_plot():
         mode = mode_var.get()
-        year = int(year_var.get())
+        year = year_var.get()
         grand_prix = gp_var.get()
         session_type = session_var.get()
         driver1 = driver1_var.get()
@@ -37,8 +37,8 @@ def on_load_session():
 
     threading.Thread(target=load_and_plot, daemon=True).start()
 
+# Start GUI
 def run_gui():
-    """Starts the GUI application with CustomTkinter."""
     global root, mode_var, year_var, gp_var, session_var, driver1_var, driver2_var
 
     ctk.set_appearance_mode("light")  
@@ -46,7 +46,7 @@ def run_gui():
 
     root = ctk.CTk()
     root.title("F1 Telemetry Analyzer")
-    root.geometry("1000x700")  # Window size
+    root.geometry("800x600") 
     root.configure(fg_color="white")
 
     # Load background image
@@ -73,7 +73,7 @@ def run_gui():
     mode_menu = ctk.CTkComboBox(frame, variable=mode_var, values=["Grand Prix"], font=("Segoe UI", 16,"bold"), width=130, justify="center")
     mode_menu.grid(row=1, column=1, columnspan=2, padx=10, pady=10)
 
-    # Year, Grand Prix, Session (Centered)
+    # Year, Grand Prix, Session
     year_var = ctk.StringVar(value="Select Year")
     year_menu = ctk.CTkComboBox(frame, variable=year_var, values=["2024", "2023","2022","2021","2020","2019","2018"], font=("Segoe UI", 16,"bold"), width=130, justify="center")
     year_menu.grid(row=2, column=0, padx=10, pady=10)

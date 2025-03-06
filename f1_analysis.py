@@ -97,8 +97,8 @@ def plot_stint_comparison(session, drivers, team_colors):
         # Plot stint comparison
         plt.plot(lap_numbers, lap_times, color=color, linewidth=2, label=f"{driver} P{int(final_position)}, {pit_stops} stop")
 
-        # Mark pit exit laps with vertical dashed lines, avoiding overlap
-        offset = 0.15  # Small offset to separate overlapping lines
+        # Mark pit exit laps with vertical dashed lines
+        offset = 0.15  # offset to separate overlapping lines
         for pit_exit in pit_exit_laps:
             pit_lap_counts[pit_exit] += 1  # Count pit stops on this lap
             shift = (pit_lap_counts[pit_exit] - 1) * offset  # Adjust position
