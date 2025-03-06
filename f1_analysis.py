@@ -103,7 +103,7 @@ def plot_stint_comparison(session, drivers, team_colors):
             pit_lap_counts[pit_exit] += 1  # Count pit stops on this lap
             shift = (pit_lap_counts[pit_exit] - 1) * offset  # Adjust position
             
-            plt.axvline(x=pit_exit + shift, color=color, linestyle=":", alpha=0.8, linewidth=1)
+            plt.axvline(x=pit_exit + shift, color=color, linestyle="-.", alpha=0.8, linewidth=1)
 
     # Titles & Labels
     driver_info = " vs ".join([f"{driver} (P{int(pos)})" for driver, pos in driver_positions.items()])
