@@ -4,4 +4,4 @@ fastf1
 matplotlib
 numpy
 seaborn
-
+collections

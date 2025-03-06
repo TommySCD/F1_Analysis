@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import gui
 import seaborn as sns
+from collections import defaultdict
 
 # Define team colors
 TEAM_COLORS = {
@@ -64,6 +65,7 @@ def plot_stint_comparison(session, drivers, team_colors):
     plt.figure(figsize=(12, 6), dpi=100)
     
     driver_positions = {}
+    pit_lap_counts = defaultdict(int)  # Track how many pit stops happened on each lap
     
     for driver in drivers:
         laps = session.laps.pick_drivers(driver)
@@ -95,9 +97,13 @@ def plot_stint_comparison(session, drivers, team_colors):
         # Plot stint comparison
         plt.plot(lap_numbers, lap_times, color=color, linewidth=2, label=f"{driver} P{int(final_position)}, {pit_stops} stop")
 
-        # Mark pit exit laps with vertical dashed lines
+        # Mark pit exit laps with vertical dashed lines, avoiding overlap
+        offset = 0.15  # Small offset to separate overlapping lines
         for pit_exit in pit_exit_laps:
-            plt.axvline(x=pit_exit, color=color, linestyle="--", alpha=0.8, linewidth=1)
+            pit_lap_counts[pit_exit] += 1  # Count pit stops on this lap
+            shift = (pit_lap_counts[pit_exit] - 1) * offset  # Adjust position
+            
+            plt.axvline(x=pit_exit + shift, color=color, linestyle=":", alpha=0.8, linewidth=1)
 
     # Titles & Labels
     driver_info = " vs ".join([f"{driver} (P{int(pos)})" for driver, pos in driver_positions.items()])
