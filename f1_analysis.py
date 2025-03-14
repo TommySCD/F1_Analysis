@@ -20,6 +20,7 @@ TEAM_COLORS = {
     "Haas F1 Team": "#B6BABD",
     "Kick Sauber": "#52E252",
     "RB": "#5E8FAA",
+    "Racing Bulls": "#FFFFFF",
     "Renault": "#FFF500",
     "Racing Point": "#F596C8",
     "Toro Rosso": "#469BFF",
@@ -116,7 +117,7 @@ def plot_stint_comparison(session, drivers, team_colors):
     plt.show()
 
 # Plot 2: Lap time distribution
-def plot_lap_time_distribution(session):
+def plot_lap_time_distribution(session, team_colors):
     plt.style.use("dark_background")
     
     laps = session.laps.pick_quicklaps()
@@ -131,8 +132,7 @@ def plot_lap_time_distribution(session):
     )
     print(team_order)
 
-    team_palette = {team: fastf1.plotting.get_team_color(team, session)
-                    for team in team_order}
+    team_palette = {team: team_colors.get(team, "#888888") for team in team_order}
 
     fig, ax = plt.subplots(figsize=(12, 6), dpi=100)
     

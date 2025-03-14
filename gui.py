@@ -30,10 +30,10 @@ def on_load_session():
                 f1_analysis.plot_stint_comparison(session, [driver1, driver2], TEAM_COLORS)
                 f1_analysis.plot_lap_time_distribution(session)
             elif session_type in ["FP1", "FP2", "FP3"]:
-                f1_analysis.plot_lap_time_distribution(session)
-                f1_analysis.plot_max_speeds(session)
                 f1_analysis.plot_best_laps(session)
-                f1_analysis.plot_lap_comparison(session, driver1, driver2)    
+                f1_analysis.plot_lap_time_distribution(session, TEAM_COLORS)
+                f1_analysis.plot_lap_comparison(session, driver1, driver2)
+                f1_analysis.plot_max_speeds(session)    
 
     threading.Thread(target=load_and_plot, daemon=True).start()
 
@@ -75,7 +75,7 @@ def run_gui():
 
     # Year, Grand Prix, Session
     year_var = ctk.StringVar(value="Select Year")
-    year_menu = ctk.CTkComboBox(frame, variable=year_var, values=["2024", "2023","2022","2021","2020","2019","2018"], font=("Segoe UI", 16,"bold"), width=130, justify="center")
+    year_menu = ctk.CTkComboBox(frame, variable=year_var, values=["2025","2024", "2023","2022","2021","2020","2019","2018"], font=("Segoe UI", 16,"bold"), width=130, justify="center")
     year_menu.grid(row=2, column=0, padx=10, pady=10)
 
     gp_var = ctk.StringVar(value="Select GP")
