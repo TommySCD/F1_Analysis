@@ -7,6 +7,7 @@ import numpy as np
 import gui
 import seaborn as sns
 from collections import defaultdict
+from scipy.interpolate import interp1d
 
 # Define team colors
 TEAM_COLORS = {
@@ -247,14 +248,29 @@ def plot_lap_comparison(session, driver1, driver2):
     lap2_time_seconds = lap2["Time"].dt.total_seconds()
     lap1_time_seconds = lap1["Time"].dt.total_seconds()
 
-    # Interpolate lap2's time onto lap1's distance
-    lap2_time_interpolated = np.interp(lap1["Distance"], lap2["Distance"], lap2_time_seconds)
+    # Ensure both start at 0
+    lap1_time_seconds -= lap1_time_seconds.iloc[0]
+    lap2_time_seconds -= lap2_time_seconds.iloc[0]
 
-    # Compute time gap
-    time_gap = lap1_time_seconds - lap2_time_interpolated
+    # Convert distances into percentage of lap completion (0% to 100%)
+    lap1_percentage = lap1["Distance"] / lap1["Distance"].max()
+    lap2_percentage = lap2["Distance"] / lap2["Distance"].max()
+
+    # Define a common progress scale (500 points evenly spaced from 0% to 100%)
+    common_progress = np.linspace(0, 1, num=500)
+
+    # Interpolate time values based on percentage of lap completed
+    lap1_time_interp = interp1d(lap1_percentage, lap1_time_seconds, kind="linear", fill_value="extrapolate")
+    lap2_time_interp = interp1d(lap2_percentage, lap2_time_seconds, kind="linear", fill_value="extrapolate")
+
+    lap1_time_common = lap1_time_interp(common_progress)
+    lap2_time_common = lap2_time_interp(common_progress)
+
+    # Compute the time gap correctly after proper alignment
+    time_gap = lap1_time_common - lap2_time_common
 
     # Plot time gap instead of speed difference
-    axs[2].plot(lap1["Distance"], time_gap, color="white")
+    axs[2].plot(common_progress*100, time_gap, color="white")
     axs[2].set_ylabel(f"{driver1} vs {driver2}")
     axs[2].axhline(0, color="gray", linestyle="--", alpha=0.7)
     axs[2].grid(True, linestyle="--", alpha=0.5)
