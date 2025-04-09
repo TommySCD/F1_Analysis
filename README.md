@@ -16,7 +16,7 @@ Closing the first plot, the second will appear and so on.
 Have fun, and analyze the data to get a better knowing of car performances! 
 
 ![Screenshot 2025-04-09 213412](https://github.com/user-attachments/assets/c33d02ec-c9b6-407f-802e-d7f0cbd08563)
-
+![Screenshot 2025-04-09 195348](https://github.com/user-attachments/assets/957ea88f-d86f-4b70-a15b-dfb2826569b5)
 ![Screenshot 2025-04-09 195726](https://github.com/user-attachments/assets/172a8a59-11a7-4442-b660-d5f932beb486)
 ![Screenshot 2025-04-09 195507](https://github.com/user-attachments/assets/4d70f8c9-d7d4-4301-b473-ff5b1c1a9232)
-![Screenshot 2025-04-09 195348](https://github.com/user-attachments/assets/957ea88f-d86f-4b70-a15b-dfb2826569b5)
+![Screenshot 2025-04-09 195726](https://github.com/user-attachments/assets/172a8a59-11a7-4442-b660-d5f932beb486)
