@@ -1,7 +1,5 @@
 F1 Analysis is a tool for analyzing F1 Telemetry Data from all the sessions using FastF1 API.
 
-![Screenshot_2025-04-09_213834_optimized](https://github.com/user-attachments/assets/cf784239-9431-46a7-b7a8-5ab085717161)
-
 How to access it:
 1. Download the folder from GitHub
 2. Open it on your IDE (required Python 3.10 or higher)
