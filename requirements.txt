@@ -1,8 +1,8 @@
-customtkinter
-pillow
 fastf1
 matplotlib
 numpy
 seaborn
-collections
 scipy
+customtkinter
+PIL
+ctk-messagebox
