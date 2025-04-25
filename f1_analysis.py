@@ -3,6 +3,8 @@ import fastf1.plotting
 import matplotlib
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
+from matplotlib.ticker import MultipleLocator
 import numpy as np
 import gui
 import seaborn as sns
@@ -199,35 +201,35 @@ def plot_best_laps(session):
     )
     plt.show()
 
-# Plot 2: Lap comparison between two drivers
+# Plot 2: Lap Time Comparison
 def plot_lap_comparison(session, driver1, driver2):
     plt.style.use("dark_background")
 
     # Get fastest lap telemetry for both drivers
-    lap1 = session.laps.pick_drivers(driver1).pick_fastest().get_telemetry()
-    lap2 = session.laps.pick_drivers(driver2).pick_fastest().get_telemetry()
+    lapdata1 = session.laps.pick_drivers(driver1).pick_fastest()
+    lapdata2 = session.laps.pick_drivers(driver2).pick_fastest()
+    lap1 = lapdata1.get_telemetry().add_distance()
+    lap2 = lapdata2.get_telemetry().add_distance()
 
-    # Ensure "Distance" is included in telemetry
-    lap1 = lap1.add_distance()
-    lap2 = lap2.add_distance()
-
-    # Get driver team colors dynamically
-    driver1_team = session.laps.pick_drivers(driver1).iloc[0]["Team"]
-    driver2_team = session.laps.pick_drivers(driver2).iloc[0]["Team"]
+    driver1_team = lapdata1["Team"]
+    driver2_team = lapdata2["Team"]
     
     color1 = TEAM_COLORS.get(driver1_team, "gray")
     color2 = TEAM_COLORS.get(driver2_team, "gray")
 
-    # Find the fastest lap between the two drivers
-    driver_laps = session.laps[session.laps["Driver"].isin([driver1, driver2])]
-    fastest_lap = driver_laps.loc[driver_laps["LapTime"].idxmin()]
+    # Format laptimes individually
+    def format_time(timedelta):
+        total_seconds = timedelta.total_seconds()
+        minutes = int(total_seconds // 60)
+        seconds = int(total_seconds % 60)
+        millis = int((total_seconds - minutes*60 - seconds) * 1000)
+        return f"{minutes}:{seconds:02}.{millis:03}"
 
-    best_lap_time = fastest_lap["LapTime"]
-    best_driver = fastest_lap["Driver"]
+    lap_time1 = lapdata1["LapTime"]
+    lap_time2 = lapdata2["LapTime"]
 
-    # Format time to m:ss.sss
-    total_seconds = best_lap_time.total_seconds()
-    formatted_time = f"{int(total_seconds // 60)}:{total_seconds % 60:06.3f}"  
+    formatted_time1 = format_time(lap_time1)
+    formatted_time2 = format_time(lap_time2)
 
     fig, axs = plt.subplots(3, 1, figsize=(12, 10), dpi=100)
 
@@ -245,31 +247,26 @@ def plot_lap_comparison(session, driver1, driver2):
     axs[1].grid(True, linestyle="--", alpha=0.5)
 
     # Convert Timedelta to total seconds
-    lap2_time_seconds = lap2["Time"].dt.total_seconds()
     lap1_time_seconds = lap1["Time"].dt.total_seconds()
+    lap2_time_seconds = lap2["Time"].dt.total_seconds()
 
-    # Ensure both start at 0
     lap1_time_seconds -= lap1_time_seconds.iloc[0]
     lap2_time_seconds -= lap2_time_seconds.iloc[0]
 
-    # Convert distances into percentage of lap completion (0% to 100%)
+    # Convert distances into percentage of lap completion
     lap1_percentage = lap1["Distance"] / lap1["Distance"].max()
     lap2_percentage = lap2["Distance"] / lap2["Distance"].max()
 
-    # Define a common progress scale (500 points evenly spaced from 0% to 100%)
     common_progress = np.linspace(0, 1, num=500)
 
-    # Interpolate time values based on percentage of lap completed
     lap1_time_interp = interp1d(lap1_percentage, lap1_time_seconds, kind="linear", fill_value="extrapolate")
     lap2_time_interp = interp1d(lap2_percentage, lap2_time_seconds, kind="linear", fill_value="extrapolate")
 
     lap1_time_common = lap1_time_interp(common_progress)
     lap2_time_common = lap2_time_interp(common_progress)
 
-    # Compute the time gap correctly after proper alignment
     time_gap = lap1_time_common - lap2_time_common
 
-    # Plot time gap instead of speed difference
     axs[2].plot(common_progress*100, time_gap, color="white")
     axs[2].set_ylabel(f"{driver1} vs {driver2}")
     axs[2].axhline(0, color="gray", linestyle="--", alpha=0.7)
@@ -277,12 +274,13 @@ def plot_lap_comparison(session, driver1, driver2):
 
     plt.xlabel("Distance (m)")
     plt.suptitle(
-        f"{session.event['EventName']} {session.event.year} {session.name} \n"
-        f"Lap Comparison: {driver1} vs {driver2}\n"
-        f"Fastest Lap Between Them: {best_driver} {formatted_time}\n"
+        f"{session.event['EventName']} {session.event.year} {session.name}\n"
+        f"Lap Time Comparison: {driver1} vs {driver2}\n"
+        f"{driver1}: {formatted_time1} | {driver2}: {formatted_time2}",
+        fontsize=14
     )
+    plt.tight_layout()
     plt.show()
-
 
 # Plot 3: Maximum Speeds Compared to Best Lap Times
 def plot_max_speeds(session):
@@ -296,7 +294,6 @@ def plot_max_speeds(session):
         max_speeds[driver] = laps["SpeedST"]
         best_laps[driver] = laps.pick_fastest()["LapTime"]
         
-        # Get team color dynamically
         team = laps.iloc[0]["Team"]
         team_colors[driver] = TEAM_COLORS.get(team, "gray")
 
@@ -315,6 +312,109 @@ def plot_max_speeds(session):
     plt.title(f"{session.event['EventName']} {session.event.year} {session.name} - Maximum Speeds vs Best Lap Time")
     plt.grid(True, linestyle="--", alpha=0.5)
     plt.style.use("dark_background")
+    plt.show()
+
+def plot_track_dominance(session, driver1, driver2):
+
+    plt.style.use("dark_background")
+    lapdata1 = session.laps.pick_drivers(driver1).pick_fastest()
+    lapdata2 = session.laps.pick_drivers(driver2).pick_fastest()
+
+    lap1 = lapdata1.get_telemetry().add_distance()
+    lap2 = lapdata2.get_telemetry().add_distance()
+
+    driver1_team = lapdata1["Team"]
+    driver2_team = lapdata2["Team"]
+
+    color_driver1 = TEAM_COLORS.get(driver1_team, 'gray')
+    color_driver2 = TEAM_COLORS.get(driver2_team, 'gray')
+
+    # Normalize time
+    lap1_time = lap1["Time"].dt.total_seconds() - lap1["Time"].dt.total_seconds().iloc[0]
+    lap2_time = lap2["Time"].dt.total_seconds() - lap2["Time"].dt.total_seconds().iloc[0]
+
+    # % lap completion
+    lap1_pct = lap1["Distance"] / lap1["Distance"].max()
+    lap2_pct = lap2["Distance"] / lap2["Distance"].max()
+    common_progress = np.linspace(0, 1, 500)
+
+    # Interpolate time
+    lap1_time_interp = interp1d(lap1_pct, lap1_time, kind='linear', fill_value='extrapolate')
+    lap2_time_interp = interp1d(lap2_pct, lap2_time, kind='linear', fill_value='extrapolate')
+
+    lap1_time_common = lap1_time_interp(common_progress)
+    lap2_time_common = lap2_time_interp(common_progress)
+    time_gap = lap1_time_common - lap2_time_common
+
+    # Interpolate positions
+    x_interp = interp1d(lap1_pct, lap1["X"], kind='linear', fill_value='extrapolate')
+    y_interp = interp1d(lap1_pct, lap1["Y"], kind='linear', fill_value='extrapolate')
+    x_common = x_interp(common_progress)
+    y_common = y_interp(common_progress)
+
+    # Begin plot
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
+
+    for i in range(len(common_progress) - 1):
+        color = color_driver1 if time_gap[i] < 0 else color_driver2
+        ax.plot(x_common[i:i+2], y_common[i:i+2], color=color, linewidth=2)
+
+    # Mark start line
+    ax.plot(x_common[0], y_common[0], marker='.', color='white', markersize=8, zorder=10)
+    ax.text(x_common[0], y_common[0], "Start", fontsize=9, ha='left', va='bottom', color='white', zorder=11)
+
+    # Plot corners with their numbers
+    circuit_info = session.get_circuit_info()
+    for _, corner in circuit_info.corners.iterrows():
+        number = corner["Number"]
+        x = corner["X"]
+        y = corner["Y"]
+        ax.text(x, y, str(number), fontsize=8, color='black', ha='center', va='center',
+                bbox=dict(facecolor='white', edgecolor='none', alpha=0.7, boxstyle='round,pad=0.2'))
+
+    # Format lap times mm:ss:ms
+    def format_time(t):
+        minutes = int(t // 60)
+        seconds = int(t % 60)
+        millis = int((t - int(t)) * 1000)
+        return f"{minutes}:{seconds:02}.{millis:03}"
+
+    lap_time1 = lapdata1["LapTime"].total_seconds()
+    lap_time2 = lapdata2["LapTime"].total_seconds()
+    subtitle = (f"Track Dominance: {driver1} vs {driver2}\n"
+                f"{driver1}: {format_time(lap_time1)} | {driver2}: {format_time(lap_time2)}")
+               
+
+    ax.set_title(f"{session.event['EventName']} {session.event.year} {session.name}\n{subtitle}")
+
+    legend_elements = [
+        Patch(facecolor=color_driver1, label=f"{driver1}\nS1: {lapdata1['Sector1Time'].total_seconds():.3f}s\nS2: {lapdata1['Sector2Time'].total_seconds():.3f}s\nS3: {lapdata1['Sector3Time'].total_seconds():.3f}s"),
+        Patch(facecolor=color_driver2, label=f"{driver2}\nS1: {lapdata2['Sector1Time'].total_seconds():.3f}s\nS2: {lapdata2['Sector2Time'].total_seconds():.3f}s\nS3: {lapdata2['Sector3Time'].total_seconds():.3f}s"),
+    ]
+
+    ax.legend(
+        handles=legend_elements,
+        loc='upper right',
+        title="Sector Times",
+        fontsize=10,
+        title_fontsize=11,
+        ncol=2,
+        framealpha=0.95,
+        borderpad=1.2,
+        labelspacing=1.2
+    )
+
+    # Turn off axis ticks and labels
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    # Make the outer box (spines) white and visible
+    for spine in ax.spines.values():
+        spine.set_visible(True)
+        spine.set_color('white')
+        spine.set_linewidth(1.5)
+
+    plt.tight_layout()
     plt.show()
 
 

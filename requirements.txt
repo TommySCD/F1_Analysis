@@ -4,5 +4,4 @@ numpy
 seaborn
 scipy
 customtkinter
-PIL
-ctk-messagebox
+Pillow

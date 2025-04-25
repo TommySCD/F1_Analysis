@@ -25,6 +25,7 @@ def on_load_session():
             if session_type == "Qualifying":
                 f1_analysis.plot_best_laps(session)
                 f1_analysis.plot_lap_comparison(session, driver1, driver2)
+                f1_analysis.plot_track_dominance(session, driver1, driver2)
                 f1_analysis.plot_max_speeds(session)
             elif session_type == "Race":
                 f1_analysis.plot_stint_comparison(session, [driver1, driver2], TEAM_COLORS)
@@ -35,7 +36,7 @@ def on_load_session():
                 f1_analysis.plot_lap_comparison(session, driver1, driver2)
                 f1_analysis.plot_max_speeds(session)    
 
-    threading.Thread(target=load_and_plot, daemon=True).start()
+    load_and_plot()
 
 # Start GUI
 def run_gui():
